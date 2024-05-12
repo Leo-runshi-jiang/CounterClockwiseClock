@@ -3,7 +3,8 @@ import json
 import time
 
 city = "hamilton" #global var storing what city we are in
-def get_weather_data(location, country = "CA"):
+nation = "CA"
+def get_weather_data(location, country):
     #function that fetches weather data from the open weather api, this function is not called in main, only conditionally
     #by other functions
     #It contacts the open weather api and writes results into the weather_data.json file
@@ -20,7 +21,7 @@ def get_weather_data(location, country = "CA"):
     weather_data = requests.get(f"https://api.openweathermap.org/data/3.0/onecall?lat={lat}&lon={lon}&units=metric&exclude=minutely,alerts&appid={api_key}").json()
 
     #saves data as json file
-    with open('weather_data.json', 'w') as f:
+    with open(f'weather_data_{city}_{nation}.json', 'w') as f:
         json.dump(weather_data, f)
 
     print(f"------DATA UPDATED ------\n on {time.time()}")
@@ -29,26 +30,26 @@ def get_weather_data(location, country = "CA"):
 def json_file_setup():
     try:
         #when the file exists
-        with open('weather_data.json') as file:
+        with open(f'weather_data_{city}_{nation}.json') as file:
             weather_data = json.load(file)
             current_unix_time = time.time()
             last_update_time = weather_data["current"]["dt"]
 
             #if the file was not updated in a hour, update it
             if current_unix_time - last_update_time >= 3600:
-                get_weather_data(city)
-                print("weather data was updated since last update was more than an hour ago ")
+                get_weather_data(city, nation)
+                print(f"weather data of {city} was updated since last update was more than an hour ago ")
                 print(f"last update was on {last_update_time}, it is now {current_unix_time}")
             else:
-                print("the data was updated recently, no need for updates")
+                print(f"the data for {city} was updated recently, no need for updates")
     except:
         #when it does not exist, update it
-        get_weather_data(city)
+        get_weather_data(city, nation)
         print("created new file for weather data json on start up")
 def show_weather_data():
     # function which displays the weather data by reading json file
     #MUST BE UPDATED DAILY
-    with open('weather_data.json') as f:
+    with open(f'weather_data_{city}_{nation}.json') as f:
         weather_data = json.load(f)
         unix_time = int(time.time())
         last_update_time = weather_data["current"]["dt"]
