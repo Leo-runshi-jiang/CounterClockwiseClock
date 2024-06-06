@@ -1,10 +1,14 @@
 import requests
 import json
 import time
+from dotenv import load_dotenv
+import os
 
 
 def get_coords(location):
-    api_key = "62c31e7df36a63f3d0dce16c2291be3a"
+
+    load_dotenv()
+    api_key = os.getenv("open_weather_api_key")
 
     # first get the coordinates of the city
     location_data = requests.get(
@@ -21,7 +25,8 @@ def get_weather_data(city,lon,lat):
     #by other functions
     #It contacts the open weather api and writes results into the weather_data.json file
 
-    api_key = "62c31e7df36a63f3d0dce16c2291be3a"
+    load_dotenv()
+    api_key = os.getenv("open_weather_api_key")
 
     #not needed anymore since wit provides coordinats
     #coords = get_coords(location)

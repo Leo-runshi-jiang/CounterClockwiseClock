@@ -1,13 +1,14 @@
 import speech_recognition as sr
 import pyttsx3
+from dotenv import load_dotenv
+import os
 from wit import Wit
 
 
-access_token = "T2WAZPX3A4R5W47UNZEICGC4V4GJHBXX"
-voiceID = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Speech\Voices\Tokens\TTS_MS_EN-US_ZIRA_11.0"
-
-
 def listen(time):
+
+    load_dotenv()
+    access_token = os.getenv("wit_api_key")
     r = sr.Recognizer()
     m = sr.Microphone()
     print("Set minimum energy threshold to {}".format(r.energy_threshold))
@@ -52,6 +53,7 @@ def interpret_resp(resp):
     return returndic
 
 def say(text):
+    voiceID = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Speech\Voices\Tokens\TTS_MS_EN-US_ZIRA_11.0"
     v = pyttsx3.init()
     v.setProperty("rate", 160)
     v.setProperty("voice", voiceID)
