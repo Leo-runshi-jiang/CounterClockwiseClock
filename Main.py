@@ -1,5 +1,6 @@
 import VoiceControl as vc
 import WeatherAPI as wapi
+import Alarm as al
 import time
 from datetime import datetime
 
@@ -41,6 +42,13 @@ def process_commands(APIresp):
         #code that runs after all keyword arguments have been determined
         print(weather_argument_dic)
         vc.say(wapi.show_weather_data(**weather_argument_dic))
+
+    #alarm related commands
+    if "alarm:alarm" in APIresp:
+        if "create:create" in APIresp:
+            alarm_set_time = ext_iso_to_unix(APIresp["wit$datetime:datetime"])
+            al.set_alarm(alarm_set_time)
+
 def main():
     iso_time = str(unix_to_iso(time.time()))
 

@@ -11,16 +11,18 @@ def listen(time):
     access_token = os.getenv("wit_api_key")
     r = sr.Recognizer()
     m = sr.Microphone()
+    r.energy_threshold = 800
     print("Set minimum energy threshold to {}".format(r.energy_threshold))
     print("I am listening, go ahead")
     try:
-        with m as source: audio = r.listen(source, 3, 6)
+        with m as source: audio = r.listen(source, 3, 10)
         print("----Recognizing----")
         client = Wit(access_token)
         resp = client.speech(audio.get_wav_data(), {'Content-Type': 'audio/wav',"reference_time":time})
         print("finished recognizing")
         return(interpret_resp(resp))
     except Exception as e:
+        print(e)
         return(e)
 
 def interpret_resp(resp):
@@ -50,6 +52,7 @@ def interpret_resp(resp):
             print("data not found")
 
     #returns a dictionary in the format of {'text':'whatever was said','entity1':'value of entity', 'entity2':'value of entity 2'
+    print(returndic)
     return returndic
 
 def say(text):

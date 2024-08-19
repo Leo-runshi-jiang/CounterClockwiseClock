@@ -3,6 +3,7 @@ import json
 import time
 from dotenv import load_dotenv
 import os
+from datetime import datetime
 
 
 def get_coords(location):
@@ -67,37 +68,43 @@ def show_weather_data(city = "hamilton", lat = 43.2501106262207, lon = -79.84963
     # function which displays the weather data by reading json file
     #MUST BE UPDATED DAILY
     with open(f'weather_data_{city}.json') as f:
-        try:
-            weather_data = json.load(f)
-            last_update_time = int(weather_data["current"]["dt"])
+        #try:
+        #convert times into datetime object
+        current_time = datetime.now()
+        target_time = datetime.fromtimestamp(time)
 
-            # extract useful entries from json data, first check how many days/ hours its been since last update
-            time_diff = (time - last_update_time)
+        # extract useful entries from json data, first check how many days/ hours its been since last update
+        weather_data = json.load(f)
 
-            if time_diff <= 30:
-                #since the calling of time is before last update time, when creating new file the time diff becomes negative
-                time_diff = 0
+        current_time = current_time.replace(minute=0, second=0, microsecond=0)
+        target_time =  target_time.replace(minute=0, second=0, microsecond=0)
+        hours_since_update = (target_time - current_time).seconds//3600
 
-            hours_since_update = (time_diff) // 3600
-            days_since_update = (time_diff) // 86400
-            print(f"its been {days_since_update} days and {hours_since_update} hours, the file was updated {last_update_time}, it is now {time}")
-            daily_summary = weather_data['daily'][days_since_update]["summary"]
-            daily_temp_max = weather_data['daily'][days_since_update]["temp"]["max"]
-            daily_temp_min = weather_data['daily'][days_since_update]["temp"]["min"]
+        current_time = current_time.replace(hour=0)
+        target_time = target_time.replace(hour=0)
+        days_since_update = (target_time - current_time).days
 
-            if mode == "hourly":
-                current_temp = weather_data['hourly'][hours_since_update]["temp"]
-                current_feels_like = weather_data['hourly'][hours_since_update]["feels_like"]
-                current_weather = weather_data['hourly'][hours_since_update]["weather"][0]["description"]
+        print(f"data requested for {time}, its been {hours_since_update} hours ({days_since_update} days), the file was updated {weather_data['current']['dt']}")
+        daily_summary = weather_data['daily'][days_since_update]["summary"]
+        daily_temp_max = weather_data['daily'][days_since_update]["temp"]["max"]
+        daily_temp_min = weather_data['daily'][days_since_update]["temp"]["min"]
 
-                print(f"The temperature in {city} is {current_temp} °C, feels like {current_feels_like} °C. There will be {current_weather}")
-                print(f"{daily_summary}, with a max of {daily_temp_max} °C, and a min of {daily_temp_min} °C")
+        if mode == "hourly":
 
-                return f"The temperature in {city} is {current_temp} °C, feels like {current_feels_like} °C. There will be {current_weather}\n{daily_summary}, with a max of {daily_temp_max} °C, and a min of {daily_temp_min} °C"
-            elif mode == "daily":
-                print(f"{daily_summary}, with a max of {daily_temp_max} °C, and a min of {daily_temp_min} °C")
-                return f"{daily_summary}, with a max of {daily_temp_max} °C, and a min of {daily_temp_min} °C"
-        except:
+            current_temp = weather_data['hourly'][hours_since_update]["temp"]
+            current_feels_like = weather_data['hourly'][hours_since_update]["feels_like"]
+            current_weather = weather_data['hourly'][hours_since_update]["weather"][0]["description"]
+
+            print(f"The temperature in {city} is {current_temp} °C, feels like {current_feels_like} °C. There will be {current_weather}")
+            print(f"{daily_summary}, with a max of {daily_temp_max} °C, and a min of {daily_temp_min} °C")
+
+            return f"The temperature in {city} is {current_temp} °C, feels like {current_feels_like} °C. There will be {current_weather}\n{daily_summary}, with a max of {daily_temp_max} °C, and a min of {daily_temp_min} °C"
+        elif mode == "daily":
+            print(f"{daily_summary}, with a max of {daily_temp_max} °C, and a min of {daily_temp_min} °C")
+            return f"{daily_summary}, with a max of {daily_temp_max} °C, and a min of {daily_temp_min} °C"
+        '''
+        except Exception as e:
             returnstr = f"sorry, I can only know the exact weather of the next {len(weather_data['hourly'])} hours or the daily weather of the next {len(weather_data['daily'])} days"
             print(returnstr)
-            return returnstr
+            print(e)
+            return returnstr'''
